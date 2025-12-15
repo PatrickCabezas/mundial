@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuenta regresiva Mundial 2026</title>
+  <style>
+    /* Paleta oscura con contraste alto */
+    :root {
+      --bg1: #0b0f1a;   /* negro azulado profundo */
+      --bg2: #121826;   /* capa intermedia */
+      --accent: #00e676;/* verde neón deportivo */
+      --text: #e6e8ee;  /* texto claro */
+      --muted: #8a93a6; /* detalles sutiles */
+      --card: rgba(18, 24, 38, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(1200px 800px at 20% 20%, #0f1a2b 0%, transparent 60%),
+        radial-gradient(1000px 600px at 80% 80%, #091223 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .wrap {
+      width: min(900px, 92vw);
+      padding: 32px;
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Detalle visual tipo “césped abstracto” con líneas diagonales */
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40% -10%;
+      transform: rotate(-12deg);
+      background-image:
+        linear-gradient(135deg, rgba(0, 230, 118, 0.06) 25%, transparent 25% 50%, rgba(0, 230, 118, 0.06) 50% 75%, transparent 75%),
+        linear-gradient(to right, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      background-size: 48px 48px, 100% 100%;
+      pointer-events: none;
+    }
+
+    .title {
+      margin: 0 0 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      font-size: clamp(16px, 3vw, 20px);
+      text-transform: uppercase;
+    }
+
+    .headline {
+      margin: 8px 0 16px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text);
+      /* Números gigantes y legibles */
+      font-size: clamp(48px, 10vw, 140px);
+      text-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+    }
+
+    .headline .num {
+      color: var(--accent);
+      display: inline-block;
+      letter-spacing: -0.02em;
+      filter: drop-shadow(0 6px 24px rgba(0, 230, 118, 0.2));
+    }
+
+    .sub {
+      margin: 0 0 24px;
+      font-size: clamp(14px, 2.5vw, 18px);
+      color: var(--muted);
+    }
+
+    .meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 14px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .progress {
+      margin-top: 22px;
+      height: 8px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00e676, #20ffa1);
+      box-shadow: 0 0 18px rgba(0, 230, 118, 0.45);
+      transition: width 0.6s ease;
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Animación sutil al cargar */
+    .fade-in {
+      animation: fade 600ms ease-out both;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card fade-in" role="region" aria-label="Cuenta regresiva Mundial 2026">
+      <p class="title">Cuenta regresiva</p>
+      <h1 class="headline" aria-live="polite">
+        <span class="num" id="dias">—</span> días
+      </h1>
+      <p class="sub">Faltan días para el inicio del Mundial 2026.</p>
+
+      <div class="meta">
+        <span class="badge">Inicio: 11 de junio de 2026</span>
+        <span class="badge">Formato: 48 selecciones</span>
+        <span class="badge">Sedes: USA · México · Canadá</span>
+      </div>
+
+      <div class="progress" aria-hidden="true">
+        <div class="bar" id="bar"></div>
+      </div>
+
+      <p class="footer">Se actualiza automáticamente según tu fecha local.</p>
+    </div>
+  </div>
+
+  <script>
+    // Fecha objetivo del Mundial (UTC para consistencia)
+    const fechaMundial = new Date(Date.UTC(2026, 5, 11, 0, 0, 0)); // 11 junio 2026 (mes 5 = junio)
+    // Opcional: define la fecha de “inicio del conteo” para la barra de progreso
+    const inicioConteo = new Date(Date.UTC(2025, 0, 1, 0, 0, 0)); // 1 enero 2025 (ajústalo si quieres)
+
+    function diasHasta(fechaObjetivo, ahoraLocal) {
+      // Normaliza a medianoche local para calcular días completos
+      const localMidnightTarget = new Date(
+        fechaObjetivo.getUTCFullYear(),
+        fechaObjetivo.getUTCMonth(),
+        fechaObjetivo.getUTCDate()
+      );
+      const localMidnightNow = new Date(
+        ahoraLocal.getFullYear(),
+        ahoraLocal.getMonth(),
+        ahoraLocal.getDate()
+      );
+      const ms = localMidnightTarget - localMidnightNow;
+      return Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));
+    }
+
+    function porcentajeProgreso(inicio, objetivo, ahora) {
+      const total = objetivo - inicio;
+      const transcurrido = Math.min(Math.max(ahora - inicio, 0), total);
+      if (total <= 0) return 100;
+      return (transcurrido / total) * 100;
+    }
+
+    function actualizar() {
+      const ahora = new Date();
+      const dias = diasHasta(fechaMundial, ahora);
+      const diasEl = document.getElementById("dias");
+      const barEl = document.getElementById("bar");
+
+      diasEl.textContent = dias.toString();
+
+      // Barra de progreso (opcional y estética)
+      const pct = porcentajeProgreso(inicioConteo, fechaMundial, ahora);
+      barEl.style.width = `${pct.toFixed(2)}%`;
+    }
+
+    // Actualiza al cargar y cada hora (no hace falta cada segundo si solo mostramos días)
+    actualizar();
+    setInterval(actualizar, 1000 * 60 * 60);
+  </script>
+</body>
+</html>
